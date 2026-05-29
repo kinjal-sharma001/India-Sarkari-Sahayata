@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+{% block title %}{% if mode == "edit" %}Edit Resume{% else %}Create Resume{% endif %} | India Sarkari Sahayata{% endblock %}
+
+{% block content %}
+  <section class="mx-auto w-full max-w-5xl rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8">
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-900">{% if mode == "edit" %}Edit Resume{% else %}Create Resume{% endif %}</h1>
+        <p class="mt-1 text-sm text-slate-600">Build a professional ATS-friendly resume with clear section structure and keyword-ready content.</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <a href="{% url 'my-resumes' %}" class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">My Resumes</a>
+        {% if resume %}
+          <a href="{% url 'resume-preview' resume.id %}" class="rounded-lg border border-slate-300 px-3 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Preview</a>
+        {% endif %}
+      </div>
+    </div>
+
+    {% if form.non_field_errors %}
+      <div class="mb-5 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-800">
+        {% for err in form.non_field_errors %}<div>{{ err }}</div>{% endfor %}
+      </div>
+    {% endif %}
+
+    <form method="post" class="space-y-6">
+      {% csrf_token %}
+
+      <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-5">
+        <h2 class="text-sm font-bold uppercase tracking-wide text-slate-700">Personal Information</h2>
+        <div class="mt-4 grid gap-4 sm:grid-cols-2">
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700" for="{{ form.full_name.id_for_label }}">Full Name</label>
+          {{ form.full_name }}
+          {% if form.full_name.errors %}<p class="mt-1 text-xs text-rose-700">{{ form.full_name.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700" for="{{ form.phone.id_for_label }}">Phone</label>
+          {{ form.phone }}
+          {% if form.phone.errors %}<p class="mt-1 text-xs text-rose-700">{{ form.phone.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700" for="{{ form.email.id_for_label }}">Email</label>
+          {{ form.email }}
+          {% if form.email.errors %}<p class="mt-1 text-xs text-rose-700">{{ form.email.errors.0 }}</p>{% endif %}
+        </div>
+        <div>
+          <label class="mb-1 block text-sm font-medium text-slate-700" for="{{ form.linkedin.id_for_label }}">LinkedIn</label>
+          {{ form.linkedin }}
+          {% if form.linkedin.errors %}<p class="mt-1 text-xs text-rose-700">{{ form.linkedin.errors.0 }}</p>{% endif %}
+        </div>
+        <div class="sm:col-span-2">
+          <label class="mb-1 block text-sm font-medium text-slate-700" for="{{ form.github.id_for_label }}">GitHub</label>
+          {{ form.github }}
+          {% if form.github.errors %}<p class="mt-1 text-xs text-rose-700">{{ form.github.errors.0 }}</p>{% endif %}
+        </div>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+        <h2 class="text-sm font-bold uppercase tracking-wide text-slate-700">Professional Summary</h2>
+        <div class="mt-3">
+        <label class="mb-1 block text-sm font-medium text-slate-700" for="{{ form.summary.id_for_label }}">Professional Summary</label>
+        {{ form.summary }}
+        <p class="mt-1 text-xs text-slate-500">Keep this concise and role-focused in 3-5 lines.</p>
+        {% if form.summary.errors %}<p class="mt-1 text-xs text-rose-700">{{ form.summary.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+        <h2 class="text-sm font-bold uppercase tracking-wide text-slate-700">Education</h2>
+        <div class="mt-3">
+        <label class="mb-1 block text-sm font-medium text-slate-700" for="{{ form.education.id_for_label }}">Education</label>
+        {{ form.education }}
+        {% if form.education.errors %}<p class="mt-1 text-xs text-rose-700">{{ form.education.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+        <h2 class="text-sm font-bold uppercase tracking-wide text-slate-700">Skills</h2>
+        <div class="mt-3">
+        <label class="mb-1 block text-sm font-medium text-slate-700" for="{{ form.skills.id_for_label }}">Skills</label>
+        {{ form.skills }}
+        <p class="mt-1 text-xs text-slate-500">Use comma-separated or bullet-style keywords for ATS parsing.</p>
+        {% if form.skills.errors %}<p class="mt-1 text-xs text-rose-700">{{ form.skills.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+        <h2 class="text-sm font-bold uppercase tracking-wide text-slate-700">Experience</h2>
+        <div class="mt-3">
+        <label class="mb-1 block text-sm font-medium text-slate-700" for="{{ form.experience.id_for_label }}">Experience</label>
+        {{ form.experience }}
+        {% if form.experience.errors %}<p class="mt-1 text-xs text-rose-700">{{ form.experience.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-slate-200 bg-white p-4 sm:p-5">
+        <h2 class="text-sm font-bold uppercase tracking-wide text-slate-700">Projects</h2>
+        <div class="mt-3">
+        <label class="mb-1 block text-sm font-medium text-slate-700" for="{{ form.projects.id_for_label }}">Projects</label>
+        {{ form.projects }}
+        {% if form.projects.errors %}<p class="mt-1 text-xs text-rose-700">{{ form.projects.errors.0 }}</p>{% endif %}
+        </div>
+      </div>
+
+      <button type="submit" class="rounded-xl bg-brand-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-brand-700">
+        {% if mode == "edit" %}Update Resume{% else %}Save Resume{% endif %}
+      </button>
+    </form>
+  </section>
+{% endblock %}

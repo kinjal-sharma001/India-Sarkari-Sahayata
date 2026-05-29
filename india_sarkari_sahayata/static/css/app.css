@@ -1,0 +1,113 @@
+:root {
+  color-scheme: light;
+  --is-bg: #f5f7ff;
+  --is-text: #0f172a;
+}
+
+body {
+  font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  background:
+    radial-gradient(circle at 10% -10%, rgb(79 70 229 / 0.16), transparent 35%),
+    radial-gradient(circle at 90% 0%, rgb(3 105 161 / 0.14), transparent 30%),
+    var(--is-bg);
+  color: var(--is-text);
+}
+
+/* Smooth image behavior for responsive assets */
+img,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+/* Small reusable utility for subtle dashboard cards */
+.is-card {
+  border: 1px solid rgb(226 232 240);
+  border-radius: 1rem;
+  background: white;
+  box-shadow: 0 1px 2px 0 rgb(15 23 42 / 0.04);
+}
+
+.is-premium-title {
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+.is-panel {
+  border: 1px solid rgb(226 232 240 / 0.9);
+  border-radius: 1.2rem;
+  background: linear-gradient(180deg, rgb(255 255 255 / 0.95), rgb(248 250 252 / 0.92));
+  box-shadow: 0 14px 38px -24px rgb(15 23 42 / 0.4);
+  backdrop-filter: blur(6px);
+}
+
+.is-gradient-panel {
+  border: 1px solid rgb(199 210 254 / 0.7);
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(130deg, rgb(79 70 229 / 0.12), rgb(14 165 233 / 0.08)),
+    linear-gradient(180deg, rgb(255 255 255 / 0.95), rgb(248 250 252 / 0.9));
+  box-shadow: 0 22px 55px -36px rgb(15 23 42 / 0.5);
+}
+
+.is-stat-card {
+  border: 1px solid rgb(226 232 240);
+  border-radius: 1rem;
+  background: white;
+  box-shadow: 0 12px 28px -24px rgb(30 41 59 / 0.48);
+  transition: transform 180ms ease, box-shadow 180ms ease;
+}
+
+.is-stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 40px -32px rgb(30 41 59 / 0.6);
+}
+
+.is-kpi-chip {
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px;
+  border: 1px solid rgb(191 219 254);
+  background: rgb(239 246 255);
+  color: rgb(30 64 175);
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.6rem;
+}
+
+.is-fade-up {
+  opacity: 0;
+  transform: translateY(12px);
+  animation: isFadeUp 460ms ease forwards;
+}
+
+.is-fade-up-delay-1 {
+  animation-delay: 90ms;
+}
+
+.is-fade-up-delay-2 {
+  animation-delay: 160ms;
+}
+
+.is-fade-up-delay-3 {
+  animation-delay: 220ms;
+}
+
+@keyframes isFadeUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-fade-up,
+  .is-fade-up-delay-1,
+  .is-fade-up-delay-2,
+  .is-fade-up-delay-3 {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}

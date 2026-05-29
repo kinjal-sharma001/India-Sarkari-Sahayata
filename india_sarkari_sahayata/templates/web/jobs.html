@@ -1,0 +1,122 @@
+{% extends "base.html" %}
+{% block title %}Jobs | India Sarkari Sahayata{% endblock %}
+
+{% block content %}
+  <div class="flex flex-col gap-6">
+    <div>
+      <h1 class="text-2xl font-bold">Government Jobs (live search)</h1>
+      <p class="mt-1 text-slate-600">Search jobs using a real external API and view results instantly.</p>
+    </div>
+
+    <section class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+      <form id="jobForm" class="grid gap-3 sm:grid-cols-[1fr,120px]">
+        <input
+          id="jobQuery"
+          class="w-full rounded-xl border border-slate-200 px-4 py-3 outline-none focus:ring-2 focus:ring-brand-600"
+          placeholder="Try: clerk, engineer, assistant..."
+          name="q"
+        />
+        <button class="rounded-xl bg-brand-600 px-5 py-3 font-semibold text-white hover:bg-brand-700" type="submit">
+          Search
+        </button>
+      </form>
+    </section>
+
+    <section class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+      <div class="flex items-center justify-between">
+        <div class="text-sm font-semibold text-slate-700">Results</div>
+        <div id="jobMeta" class="text-xs text-slate-500"></div>
+      </div>
+      <div id="jobResults" class="mt-4 grid gap-3 md:grid-cols-2"></div>
+    </section>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    const form = document.getElementById("jobForm");
+    const queryEl = document.getElementById("jobQuery");
+    const resultsEl = document.getElementById("jobResults");
+    const metaEl = document.getElementById("jobMeta");
+
+    async function runSearch(q) {
+      resultsEl.innerHTML = window.IS_UI.skeletonCards(6);
+      metaEl.textContent = "Loading...";
+      try {
+        const url = `/api/jobs/search/?q=${encodeURIComponent(q || "")}&limit=20`;
+        const res = await fetch(url);
+        if (!res.ok) {
+          const text = await res.text();
+          let detail = text;
+          try {
+            detail = JSON.parse(text)?.detail || text;
+          } catch (_e) {}
+
+          if (String(detail).toLowerCase().includes("credentials")) {
+            const fallbackRes = await fetch("/api/jobs/");
+            if (fallbackRes.ok) {
+              const fallbackData = await fallbackRes.json();
+              const fallbackItems = fallbackData.results || [];
+              metaEl.textContent = `${fallbackData.count ?? fallbackItems.length} result(s)`;
+              resultsEl.innerHTML = fallbackItems.length
+                ? fallbackItems
+                    .map((j) =>
+                      window.IS_UI.card({
+                        title: j.title,
+                        subtitle: [j.company, j.location].filter(Boolean).join(" • "),
+                        href: j.url,
+                        badge: j.source || "saved",
+                        saveUrl: j.id ? `/profile/saved-jobs/${j.id}/toggle/` : "",
+                      })
+                    )
+                    .join("")
+                : window.IS_UI.emptyState("Jobs unavailable", "Jobs feed is being configured. Please check again shortly.");
+              return;
+            }
+            resultsEl.innerHTML = window.IS_UI.emptyState("Jobs unavailable", "Jobs feed is being configured. Please check again shortly.");
+            metaEl.textContent = "";
+            return;
+          }
+
+          resultsEl.innerHTML = window.IS_UI.emptyState("Jobs unavailable", "Unable to load jobs right now. Please try again later.");
+          metaEl.textContent = "";
+          return;
+        }
+        const data = await res.json();
+        const items = data.results || [];
+        metaEl.textContent = `${data.count ?? items.length} result(s)`;
+        resultsEl.innerHTML = items.length
+          ? items
+            .map((j) =>
+              window.IS_UI.card({
+                title: j.title,
+                subtitle: [j.company, j.location].filter(Boolean).join(" • "),
+                href: j.url,
+                badge: j.source,
+                saveUrl: j.id ? `/profile/saved-jobs/${j.id}/toggle/` : "",
+              })
+            )
+            .join("")
+          : window.IS_UI.emptyState("No jobs found", "Try a different keyword such as assistant or officer.");
+      } catch (error) {
+        resultsEl.innerHTML = window.IS_UI.errorBox(
+          "Network error",
+          error?.message || "Unable to reach jobs API right now."
+        );
+        metaEl.textContent = "";
+      }
+    }
+
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      runSearch(queryEl.value);
+    });
+
+    // auto-run from query string if present
+    const params = new URLSearchParams(window.location.search);
+    const q = params.get("q") || "";
+    if (q) queryEl.value = q;
+    runSearch(q || "clerk");
+  </script>
+{% endblock %}
+

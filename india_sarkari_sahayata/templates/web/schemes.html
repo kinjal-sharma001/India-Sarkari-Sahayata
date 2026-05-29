@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block title %}Schemes | India Sarkari Sahayata{% endblock %}
+
+{% block content %}
+  <div class="flex flex-col gap-6">
+    <div>
+      <h1 class="text-2xl font-bold">Government Schemes</h1>
+      <p class="mt-1 text-slate-600">Browse active schemes with category and eligibility-aware filtering.</p>
+    </div>
+
+    <section class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+      <form id="schemeForm" class="grid gap-3 md:grid-cols-4">
+        <input
+          id="schemeSearch"
+          class="rounded-xl border border-slate-200 px-4 py-3 outline-none focus:ring-2 focus:ring-brand-600 md:col-span-2"
+          placeholder="Search by title, eligibility, benefits..."
+          name="search"
+        />
+        <select id="schemeState" class="rounded-xl border border-slate-200 px-4 py-3">
+          <option value="">All states</option>
+          <option value="ALL">All India</option>
+          <option value="UP">Uttar Pradesh</option>
+          <option value="DL">Delhi</option>
+          <option value="MH">Maharashtra</option>
+          <option value="BR">Bihar</option>
+          <option value="RJ">Rajasthan</option>
+        </select>
+        <select id="schemeCategory" class="rounded-xl border border-slate-200 px-4 py-3">
+          <option value="">All categories</option>
+        </select>
+        <select id="schemeEligibility" class="rounded-xl border border-slate-200 px-4 py-3">
+          <option value="">All eligibility groups</option>
+        </select>
+      </form>
+      <div class="mt-3 text-xs text-slate-500">
+        Add/edit schemes in <a class="underline" href="/admin/">Admin</a>.
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+      <div class="flex items-center justify-between">
+        <div class="text-sm font-semibold text-slate-700">Results</div>
+        <div id="schemeMeta" class="text-xs text-slate-500"></div>
+      </div>
+      <div id="schemeResults" class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3"></div>
+    </section>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    const form = document.getElementById("schemeForm");
+    const searchEl = document.getElementById("schemeSearch");
+    const stateEl = document.getElementById("schemeState");
+    const categoryEl = document.getElementById("schemeCategory");
+    const eligibilityEl = document.getElementById("schemeEligibility");
+    const resultsEl = document.getElementById("schemeResults");
+    const metaEl = document.getElementById("schemeMeta");
+
+    async function loadCategories() {
+      try {
+        const res = await fetch("/api/schemes/categories/");
+        if (!res.ok) return;
+        const data = await res.json();
+        const items = data.results || data;
+        (items || []).forEach((c) => {
+          const opt = document.createElement("option");
+          opt.value = c.id;
+          opt.textContent = c.name;
+          categoryEl.appendChild(opt);
+        });
+      } catch (_error) {
+        // Non-blocking: category filter remains optional.
+      }
+    }
+
+    function appendOptions(selectEl, options) {
+      const existing = new Set(Array.from(selectEl.options).map((o) => o.value));
+      options.filter(Boolean).sort().forEach((value) => {
+        if (existing.has(value)) return;
+        const option = document.createElement("option");
+        option.value = value;
+        option.textContent = value;
+        selectEl.appendChild(option);
+      });
+    }
+
+    async function loadSchemes() {
+      resultsEl.innerHTML = window.IS_UI.skeletonCards(6);
+      metaEl.textContent = "Loading...";
+
+      const params = new URLSearchParams();
+      if (searchEl.value) params.set("search", searchEl.value);
+      if (stateEl.value) params.set("state", stateEl.value);
+      if (categoryEl.value) params.set("category", categoryEl.value);
+      if (eligibilityEl.value) params.set("eligibility", eligibilityEl.value);
+      params.set("is_active", "true");
+
+      try {
+        const res = await fetch(`/api/schemes/?${params.toString()}`);
+        if (!res.ok) {
+          const text = await res.text();
+          resultsEl.innerHTML = window.IS_UI.errorBox("Schemes API error", text);
+          metaEl.textContent = "";
+          return;
+        }
+        const data = await res.json();
+        const items = data.results || [];
+        metaEl.textContent = `${data.count ?? items.length} result(s)`;
+        resultsEl.innerHTML = items.length
+          ? items
+            .map((s) =>
+              window.IS_UI.card({
+                title: s.title,
+                subtitle: [s.category?.name, s.state, s.ministry_or_department].filter(Boolean).join(" • "),
+                href: s.application_url || "#",
+                badge: s.category?.name || "Scheme",
+                body: s.summary || s.description || s.benefits || s.eligibility || "",
+                tags: s.tags || [],
+                linkLabel: "Official website",
+              })
+            )
+            .join("")
+          : window.IS_UI.emptyState("No schemes found", "Adjust the state/category filters to widen results.");
+      } catch (error) {
+        resultsEl.innerHTML = window.IS_UI.errorBox(
+          "Network error",
+          error?.message || "Unable to reach schemes API right now."
+        );
+        metaEl.textContent = "";
+      }
+    }
+
+    async function loadEligibilityOptions() {
+      try {
+        const res = await fetch("/api/schemes/?is_active=true&page_size=200");
+        if (!res.ok) return;
+        const data = await res.json();
+        const items = data.results || [];
+        const eligibilityValues = [...new Set(
+          items.flatMap((item) => Array.isArray(item.tags) ? item.tags : []).filter(Boolean)
+        )];
+        appendOptions(eligibilityEl, eligibilityValues);
+      } catch (_error) {
+        // Non-blocking: eligibility filter remains optional.
+      }
+    }
+
+    let timer = null;
+    function scheduleLoad() {
+      clearTimeout(timer);
+      timer = setTimeout(loadSchemes, 250);
+    }
+
+    form.addEventListener("input", scheduleLoad);
+    Promise.allSettled([loadCategories(), loadEligibilityOptions()]).then(loadSchemes);
+  </script>
+{% endblock %}
+

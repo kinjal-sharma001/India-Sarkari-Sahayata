@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}Resume Preview | India Sarkari Sahayata{% endblock %}
+
+{% block content %}
+  <section class="mx-auto w-full max-w-4xl space-y-5">
+    <div class="flex flex-wrap items-center gap-3">
+      <a href="{% url 'resume-edit' resume.id %}" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">Edit Resume</a>
+      <a href="{% url 'resume-download' resume.id %}" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">Download PDF</a>
+      <a href="{% url 'resume-analyzer-resume' resume.id %}" class="rounded-lg border border-indigo-300 px-4 py-2 text-sm font-semibold text-indigo-700 hover:bg-indigo-50">AI Analyze</a>
+    </div>
+
+    <article class="rounded-2xl bg-white p-8 shadow-sm ring-1 ring-slate-200">
+      <header class="border-b border-slate-200 pb-4">
+        <h1 class="text-3xl font-bold text-slate-900">{{ resume.full_name }}</h1>
+        <p class="mt-2 text-sm text-slate-700">
+          {{ resume.email }}{% if resume.phone %} • {{ resume.phone }}{% endif %}
+          {% if resume.linkedin %} • {{ resume.linkedin }}{% endif %}
+          {% if resume.github %} • {{ resume.github }}{% endif %}
+        </p>
+      </header>
+
+      {% if resume.summary %}
+        <section class="mt-5">
+          <h2 class="text-sm font-bold uppercase tracking-wide text-slate-800">Professional Summary</h2>
+          <p class="mt-2 whitespace-pre-line text-sm text-slate-700">{{ resume.summary }}</p>
+        </section>
+      {% endif %}
+
+      {% if resume.education %}
+        <section class="mt-5">
+          <h2 class="text-sm font-bold uppercase tracking-wide text-slate-800">Education</h2>
+          <p class="mt-2 whitespace-pre-line text-sm text-slate-700">{{ resume.education }}</p>
+        </section>
+      {% endif %}
+
+      {% if resume.skills %}
+        <section class="mt-5">
+          <h2 class="text-sm font-bold uppercase tracking-wide text-slate-800">Skills</h2>
+          <p class="mt-2 whitespace-pre-line text-sm text-slate-700">{{ resume.skills }}</p>
+        </section>
+      {% endif %}
+
+      {% if resume.experience %}
+        <section class="mt-5">
+          <h2 class="text-sm font-bold uppercase tracking-wide text-slate-800">Experience</h2>
+          <p class="mt-2 whitespace-pre-line text-sm text-slate-700">{{ resume.experience }}</p>
+        </section>
+      {% endif %}
+
+      {% if resume.projects %}
+        <section class="mt-5">
+          <h2 class="text-sm font-bold uppercase tracking-wide text-slate-800">Projects</h2>
+          <p class="mt-2 whitespace-pre-line text-sm text-slate-700">{{ resume.projects }}</p>
+        </section>
+      {% endif %}
+    </article>
+  </section>
+{% endblock %}

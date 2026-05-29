@@ -1,0 +1,249 @@
+{% extends "base.html" %}
+{% block title %}AI Assistant | India Sarkari Sahayata{% endblock %}
+
+{% block content %}
+  <div class="space-y-6">
+    <section class="is-gradient-panel is-fade-up p-6">
+      <h1 class="is-premium-title text-2xl text-slate-900 sm:text-3xl" style="font-family: 'Plus Jakarta Sans', Inter, sans-serif;">AI Assistant Hub</h1>
+      <p class="mt-2 max-w-3xl text-sm text-slate-700 sm:text-base">
+        Analyze resumes for ATS readiness, get AI-based scheme recommendations, and ask career questions in one place.
+      </p>
+    </section>
+
+    <section class="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <article class="is-stat-card p-4">
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">AI Resume</p>
+        <p class="mt-2 text-xl font-bold text-slate-900">ATS Intelligence</p>
+        <p class="mt-1 text-xs text-slate-600">Strengths, missing skills, and improvement actions.</p>
+      </article>
+      <article class="is-stat-card p-4">
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Scheme Match</p>
+        <p class="mt-2 text-xl font-bold text-slate-900">Profile-Aware</p>
+        <p class="mt-1 text-xs text-slate-600">Recommendations based on age, income, education, category.</p>
+      </article>
+      <article class="is-stat-card p-4">
+        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Career Bot</p>
+        <p class="mt-2 text-xl font-bold text-slate-900">Realtime Answers</p>
+        <p class="mt-1 text-xs text-slate-600">Jobs, schemes, scholarships, and next-step guidance.</p>
+      </article>
+      <article class="rounded-2xl border border-indigo-200 bg-gradient-to-br from-indigo-600 to-sky-600 p-4 text-white shadow-lg">
+        <p class="text-xs font-semibold uppercase tracking-wide text-indigo-100">Platform Mode</p>
+        <p class="mt-2 text-xl font-bold">Premium AI UX</p>
+        <p class="mt-1 text-xs text-indigo-100">Fast workflows with polished visual feedback.</p>
+      </article>
+    </section>
+
+    <section class="grid gap-6 lg:grid-cols-2">
+      <article class="is-panel is-fade-up p-5">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <h2 class="text-lg font-semibold text-slate-900">AI Resume Analyzer</h2>
+            <p class="mt-1 text-sm text-slate-600">Paste resume text to get ATS score, improvements, and missing skills.</p>
+          </div>
+        </div>
+        <form id="resumeForm" class="mt-4 space-y-3">
+          <textarea
+            id="resumeText"
+            class="min-h-44 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-brand-600"
+            placeholder="Paste your full resume text here..."
+            required
+          ></textarea>
+          <button id="resumeBtn" class="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">Analyze Resume</button>
+        </form>
+        <div id="resumeResult" class="mt-4"></div>
+      </article>
+
+      <article class="is-panel is-fade-up is-fade-up-delay-1 p-5">
+        <h2 class="text-lg font-semibold text-slate-900">AI Scheme Recommendation</h2>
+        <p class="mt-1 text-sm text-slate-600">Get personalized schemes and scholarship suggestions from profile details.</p>
+        <form id="schemeAiForm" class="mt-4 grid gap-3 sm:grid-cols-2">
+          <input id="age" type="number" min="14" max="100" placeholder="Age" class="rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-brand-600" required />
+          <input id="category" type="text" placeholder="Category (e.g. OBC, SC, General)" class="rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-brand-600" required />
+          <input id="income" type="number" min="0" placeholder="Annual Income (INR)" class="rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-brand-600" required />
+          <input id="education" type="text" placeholder="Education (e.g. 12th, UG, PG)" class="rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-brand-600" required />
+          <div class="sm:col-span-2">
+            <button id="schemeAiBtn" class="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">Get Recommendations</button>
+          </div>
+        </form>
+        <div id="schemeAiResult" class="mt-4"></div>
+      </article>
+    </section>
+
+    <section class="is-panel is-fade-up is-fade-up-delay-2 p-5">
+      <h2 class="text-lg font-semibold text-slate-900">AI Career Chatbot</h2>
+      <p class="mt-1 text-sm text-slate-600">Ask questions about jobs, careers, scholarships, and schemes.</p>
+      <form id="chatForm" class="mt-4 grid gap-3 lg:grid-cols-4">
+        <input id="chatEducation" type="text" placeholder="Education (optional)" class="rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-brand-600" />
+        <input id="chatAge" type="number" min="14" max="100" placeholder="Age (optional)" class="rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-brand-600" />
+        <input id="chatCategory" type="text" placeholder="Category (optional)" class="rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-brand-600" />
+        <input id="chatIncome" type="number" min="0" placeholder="Income (optional)" class="rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-brand-600" />
+        <textarea
+          id="chatQuestion"
+          class="min-h-28 w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-brand-600 lg:col-span-4"
+          placeholder="Example: Which scholarships can I apply for after 12th with family income below 3 lakh?"
+          required
+        ></textarea>
+        <div class="lg:col-span-4">
+          <button id="chatBtn" class="rounded-xl bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">Ask AI</button>
+        </div>
+      </form>
+      <div id="chatResult" class="mt-4"></div>
+    </section>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    const aiHistory = [];
+    const safeList = (items) => Array.isArray(items) ? items.filter(Boolean) : [];
+    const getCsrfToken = () => {
+      const cookie = document.cookie
+        .split(";")
+        .map((v) => v.trim())
+        .find((v) => v.startsWith("csrftoken="));
+      return cookie ? decodeURIComponent(cookie.split("=")[1]) : "";
+    };
+
+    function setLoading(button, isLoading, label) {
+      if (!button) return;
+      button.disabled = isLoading;
+      button.textContent = isLoading ? "Please wait..." : label;
+      button.classList.toggle("opacity-70", isLoading);
+      button.classList.toggle("cursor-not-allowed", isLoading);
+    }
+
+    function renderList(title, items) {
+      const validItems = safeList(items);
+      if (!validItems.length) return "";
+      return `
+        <div class="mt-3">
+          <h4 class="text-xs font-semibold uppercase tracking-wide text-slate-500">${window.IS_UI.escapeHtml(title)}</h4>
+          <ul class="mt-2 list-disc space-y-1 pl-5 text-sm text-slate-700">
+            ${validItems.map((item) => `<li>${window.IS_UI.escapeHtml(String(item))}</li>`).join("")}
+          </ul>
+        </div>
+      `;
+    }
+
+    async function postJson(url, payload) {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "X-CSRFToken": getCsrfToken() },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json().catch(() => ({}));
+      if (!response.ok || data.success === false) {
+        const detail = data?.message || data?.detail || JSON.stringify(data) || "Request failed";
+        throw new Error(detail);
+      }
+      return data;
+    }
+
+    document.getElementById("resumeForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const button = document.getElementById("resumeBtn");
+      const result = document.getElementById("resumeResult");
+      const resumeText = document.getElementById("resumeText").value.trim();
+      if (!resumeText) return;
+      setLoading(button, true, "Analyze Resume");
+      result.innerHTML = window.IS_UI.skeletonCards(1);
+      try {
+        const data = await postJson("/api/ai/resume-analyzer/", { resume_text: resumeText });
+        const out = data.data || {};
+        const score = Number(out.ats_score);
+        result.innerHTML = `
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <div class="flex items-center justify-between">
+              <h3 class="text-sm font-semibold text-slate-900">ATS Analysis</h3>
+              <span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-semibold text-emerald-700">${Number.isFinite(score) ? score : "--"}/100</span>
+            </div>
+            <p class="mt-2 text-sm text-slate-700">${window.IS_UI.escapeHtml(out.summary || "No summary returned.")}</p>
+            ${renderList("Improvements", out.improvements)}
+            ${renderList("Missing Skills", out.missing_skills)}
+            ${renderList("Keyword Recommendations", out.keyword_recommendations)}
+          </div>
+        `;
+      } catch (error) {
+        result.innerHTML = window.IS_UI.errorBox("Resume analyzer failed", error?.message || "Unable to analyze resume.");
+      } finally {
+        setLoading(button, false, "Analyze Resume");
+      }
+    });
+
+    document.getElementById("schemeAiForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const button = document.getElementById("schemeAiBtn");
+      const result = document.getElementById("schemeAiResult");
+      const payload = {
+        age: Number(document.getElementById("age").value),
+        category: document.getElementById("category").value.trim(),
+        income: Number(document.getElementById("income").value),
+        education: document.getElementById("education").value.trim(),
+      };
+      setLoading(button, true, "Get Recommendations");
+      result.innerHTML = window.IS_UI.skeletonCards(2);
+      try {
+        const data = await postJson("/api/ai/scheme-recommendation/", payload);
+        const out = data.data || {};
+        const recs = safeList(out.recommended_schemes);
+        result.innerHTML = `
+          <div class="space-y-3">
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-700">
+              <span class="font-semibold text-slate-900">Profile Summary:</span> ${window.IS_UI.escapeHtml(out.profile_summary || "No profile summary provided.")}
+            </div>
+            ${recs.length ? recs.map((item) => `
+              <div class="rounded-xl border border-slate-200 bg-white p-4">
+                <div class="flex items-center justify-between gap-2">
+                  <p class="text-sm font-semibold text-slate-900">${window.IS_UI.escapeHtml(item.title || "Untitled recommendation")}</p>
+                  <span class="rounded-full bg-brand-50 px-2 py-1 text-xs font-semibold text-brand-700">${window.IS_UI.escapeHtml(item.type || "opportunity")}</span>
+                </div>
+                <p class="mt-2 text-sm text-slate-700">${window.IS_UI.escapeHtml(item.why_recommended || "No reason provided.")}</p>
+                <p class="mt-2 text-xs text-slate-500">Eligibility match: ${window.IS_UI.escapeHtml(String(item.eligibility_match_score ?? "--"))}/100</p>
+                <p class="mt-1 text-xs text-slate-500">Next step: ${window.IS_UI.escapeHtml(item.next_step || "Check official portal for application details.")}</p>
+              </div>
+            `).join("") : window.IS_UI.emptyState("No recommendations", "Try broader profile details and retry.")}
+            ${renderList("Notes", out.notes)}
+          </div>
+        `;
+      } catch (error) {
+        result.innerHTML = window.IS_UI.errorBox("Scheme recommendation failed", error?.message || "Unable to fetch recommendations.");
+      } finally {
+        setLoading(button, false, "Get Recommendations");
+      }
+    });
+
+    document.getElementById("chatForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const button = document.getElementById("chatBtn");
+      const result = document.getElementById("chatResult");
+      const payload = {
+        question: document.getElementById("chatQuestion").value.trim(),
+        education: document.getElementById("chatEducation").value.trim(),
+        age: document.getElementById("chatAge").value ? Number(document.getElementById("chatAge").value) : undefined,
+        category: document.getElementById("chatCategory").value.trim(),
+        income: document.getElementById("chatIncome").value ? Number(document.getElementById("chatIncome").value) : undefined,
+        history: aiHistory,
+      };
+      setLoading(button, true, "Ask AI");
+      result.innerHTML = window.IS_UI.skeletonCards(1);
+      try {
+        const data = await postJson("/api/ai/career-chat/", payload);
+        const out = data.data || {};
+        aiHistory.push({ role: "user", content: payload.question });
+        aiHistory.push({ role: "assistant", content: out.answer || "" });
+        result.innerHTML = `
+          <div class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
+            <h3 class="text-sm font-semibold text-slate-900">AI Answer</h3>
+            <p class="mt-2 whitespace-pre-line text-sm text-slate-700">${window.IS_UI.escapeHtml(out.answer || "No answer returned.")}</p>
+            ${renderList("Action Items", out.action_items)}
+            ${renderList("Related Topics", out.related_topics)}
+          </div>
+        `;
+      } catch (error) {
+        result.innerHTML = window.IS_UI.errorBox("Career chatbot failed", error?.message || "Unable to process your question.");
+      } finally {
+        setLoading(button, false, "Ask AI");
+      }
+    });
+  </script>
+{% endblock %}

@@ -1,0 +1,264 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{% block title %}India Sarkari Sahayata{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet" />
+    <link rel="icon" type="image/svg+xml" href="{% static 'icons/favicon.svg' %}" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="{% static 'css/app.css' %}" />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              brand: {
+                50: "#eef2ff",
+                100: "#e0e7ff",
+                600: "#4f46e5",
+                700: "#4338ca",
+              },
+              govt: {
+                50: "#f0f9ff",
+                100: "#e0f2fe",
+                600: "#0369a1",
+                700: "#075985",
+              },
+            },
+          },
+        },
+      };
+    </script>
+  </head>
+  <body class="min-h-screen bg-slate-100 text-slate-900" style="font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;">
+    <div class="min-h-screen flex">
+    <aside id="mobileNav" class="hidden w-72 shrink-0 border-r border-slate-200 bg-white p-4">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-600 font-bold text-white">IS</div>
+          <div>
+            <p class="text-sm font-semibold text-slate-900">India Sarkari Sahayata</p>
+            <p class="text-xs text-slate-500">Government Services Dashboard</p>
+          </div>
+        </div>
+        <button id="mobileNavClose" type="button" class="rounded-lg border border-slate-300 px-3 py-1 text-xs font-semibold text-slate-700">Close</button>
+      </div>
+      <nav class="mt-4 space-y-1 text-sm">
+        {% if user.is_authenticated %}
+          <a href="/" class="block rounded-xl px-3 py-2 font-medium text-slate-700 hover:bg-slate-100">Dashboard</a>
+          <a href="{% url 'profile' %}" class="block rounded-xl px-3 py-2 font-medium text-slate-700 hover:bg-slate-100">My Profile</a>
+          <a href="{% url 'my-resumes' %}" class="block rounded-xl px-3 py-2 font-medium text-slate-700 hover:bg-slate-100">Resume Builder</a>
+          <a href="/jobs/" class="block rounded-xl px-3 py-2 font-medium text-slate-700 hover:bg-slate-100">Jobs</a>
+          <a href="/schemes/" class="block rounded-xl px-3 py-2 font-medium text-slate-700 hover:bg-slate-100">Schemes</a>
+          <a href="/scholarships/" class="block rounded-xl px-3 py-2 font-medium text-slate-700 hover:bg-slate-100">Scholarships</a>
+          <a href="/ai-assistant/" class="block rounded-xl px-3 py-2 font-medium text-slate-700 hover:bg-slate-100">AI Assistant</a>
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit" class="mt-2 w-full rounded-xl bg-slate-900 px-3 py-2 text-left font-medium text-white hover:bg-slate-700">Logout</button>
+          </form>
+        {% else %}
+          <a href="{% url 'login' %}" class="block rounded-xl bg-brand-600 px-3 py-2 font-medium text-white hover:bg-brand-700">Login</a>
+          <a href="{% url 'register' %}" class="block rounded-xl border border-slate-300 px-3 py-2 font-medium text-slate-700 hover:bg-slate-100">Register</a>
+        {% endif %}
+      </nav>
+    </aside>
+      <div class="flex-1">
+        <header class="border-b border-slate-200 bg-white">
+          <div class="flex h-20 w-full items-center justify-between gap-4 px-2 sm:px-4">
+            <div class="flex items-center gap-3">
+              <button id="navToggle" type="button" class="ml-1 rounded-xl border border-slate-300 px-4 py-2 text-lg font-bold leading-none text-slate-700">☰</button>
+              <p class="text-base font-semibold text-slate-900">India Sarkari Sahayata</p>
+            </div>
+            <div class="flex-1"></div>
+            <div class="flex items-center gap-2">
+              {% if user.is_authenticated %}
+                <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">Hi, {{ user.username }}</span>
+              {% else %}
+                <a href="{% url 'register' %}" class="rounded-full bg-brand-50 px-3 py-1 text-xs font-semibold text-brand-700 hover:bg-brand-100">Create Account</a>
+              {% endif %}
+            </div>
+          </div>
+        </header>
+
+        <main class="mx-auto w-full max-w-7xl space-y-8 px-4 py-8 sm:px-6 lg:px-8">
+          {% if messages %}
+            <section class="space-y-2">
+              {% for message in messages %}
+                <div class="rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-800 shadow-sm">
+                  {{ message }}
+                </div>
+              {% endfor %}
+            </section>
+          {% endif %}
+          {% block content %}{% endblock %}
+        </main>
+      </div>
+    </div>
+
+    {% if user.is_authenticated %}
+      <div class="fixed bottom-5 right-5 z-50">
+        <button
+          id="careerChatToggle"
+          type="button"
+          class="flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-2xl text-white shadow-lg transition hover:bg-brand-700 focus:outline-none focus:ring-4 focus:ring-brand-100"
+          aria-label="Open AI career chatbot"
+        >
+          💬
+        </button>
+      </div>
+
+      <section id="careerChatWidget" class="fixed bottom-24 right-5 z-50 hidden w-[22rem] max-w-[calc(100vw-2rem)] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl sm:w-[25rem]">
+        <header class="flex items-center justify-between border-b border-slate-200 bg-slate-50 px-4 py-3">
+          <div>
+            <h3 class="text-sm font-semibold text-slate-900">AI Career Guide</h3>
+            <p class="text-xs text-slate-500">Jobs, schemes, scholarships</p>
+          </div>
+          <button id="careerChatClose" type="button" class="rounded-md px-2 py-1 text-slate-500 hover:bg-slate-200 hover:text-slate-800" aria-label="Close chatbot">✕</button>
+        </header>
+
+        <div id="careerChatMessages" class="h-80 space-y-3 overflow-y-auto bg-slate-50 p-4 text-sm">
+          <div class="max-w-[92%] rounded-xl bg-white px-3 py-2 text-slate-700 shadow-sm">
+            Ask me about careers, government jobs, scholarships, and schemes.
+          </div>
+        </div>
+
+        <form id="careerChatForm" class="border-t border-slate-200 p-3">
+          <div class="flex items-end gap-2">
+            <textarea
+              id="careerChatInput"
+              class="max-h-24 min-h-11 w-full resize-y rounded-xl border border-slate-200 px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-brand-600"
+              placeholder="Type your question..."
+              required
+            ></textarea>
+            <button id="careerChatSend" class="rounded-xl bg-brand-600 px-3 py-2 text-sm font-semibold text-white hover:bg-brand-700">Send</button>
+          </div>
+          <p id="careerChatStatus" class="mt-1 text-xs text-slate-500"></p>
+        </form>
+      </section>
+    {% endif %}
+
+    <script src="{% static 'js/ui.js' %}"></script>
+    <script>
+      window.IS_UI.initSharedUI();
+      (function () {
+        const toggleBtn = document.getElementById("navToggle");
+        const panel = document.getElementById("mobileNav");
+        const closeBtn = document.getElementById("mobileNavClose");
+        if (!toggleBtn || !panel) return;
+        const openPanel = () => {
+          panel.classList.remove("hidden");
+          panel.style.display = "block";
+        };
+        const closePanel = () => {
+          panel.classList.add("hidden");
+          panel.style.display = "";
+        };
+        toggleBtn.addEventListener("click", (e) => {
+          e.preventDefault();
+          if (panel.classList.contains("hidden")) {
+            openPanel();
+          } else {
+            closePanel();
+          }
+        });
+        if (closeBtn) {
+          closeBtn.addEventListener("click", closePanel);
+        }
+      })();
+
+      (function () {
+        const toggleBtn = document.getElementById("careerChatToggle");
+        const widget = document.getElementById("careerChatWidget");
+        const closeBtn = document.getElementById("careerChatClose");
+        const form = document.getElementById("careerChatForm");
+        const input = document.getElementById("careerChatInput");
+        const sendBtn = document.getElementById("careerChatSend");
+        const status = document.getElementById("careerChatStatus");
+        const messages = document.getElementById("careerChatMessages");
+        if (!toggleBtn || !widget || !form || !input || !messages || !sendBtn || !status) return;
+
+        const history = [];
+
+        function getCsrfToken() {
+          const cookie = document.cookie
+            .split(";")
+            .map((entry) => entry.trim())
+            .find((entry) => entry.startsWith("csrftoken="));
+          return cookie ? decodeURIComponent(cookie.split("=")[1]) : "";
+        }
+
+        function addMessage(role, text) {
+          const bubble = document.createElement("div");
+          bubble.className =
+            role === "user"
+              ? "ml-auto max-w-[92%] rounded-xl bg-brand-600 px-3 py-2 text-white shadow-sm"
+              : "max-w-[92%] rounded-xl bg-white px-3 py-2 text-slate-700 shadow-sm";
+          bubble.textContent = text;
+          messages.appendChild(bubble);
+          messages.scrollTop = messages.scrollHeight;
+        }
+
+        function setOpen(isOpen) {
+          widget.classList.toggle("hidden", !isOpen);
+          if (isOpen) input.focus();
+        }
+
+        async function sendQuestion(question) {
+          const response = await fetch("/api/ai/career-chat/", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "X-CSRFToken": getCsrfToken(),
+            },
+            body: JSON.stringify({
+              question: question,
+              history: history,
+            }),
+          });
+          const data = await response.json().catch(() => ({}));
+          if (!response.ok || data.success === false) {
+            throw new Error(data?.message || data?.detail || "Failed to get AI response.");
+          }
+          return data?.data || {};
+        }
+
+        toggleBtn.addEventListener("click", () => setOpen(widget.classList.contains("hidden")));
+        closeBtn?.addEventListener("click", () => setOpen(false));
+
+        form.addEventListener("submit", async (event) => {
+          event.preventDefault();
+          const question = input.value.trim();
+          if (!question) return;
+          addMessage("user", question);
+          history.push({ role: "user", content: question });
+          input.value = "";
+          status.textContent = "Thinking...";
+          sendBtn.disabled = true;
+          sendBtn.classList.add("opacity-70", "cursor-not-allowed");
+
+          try {
+            const out = await sendQuestion(question);
+            const answer = String(out.answer || "I could not generate a response right now.");
+            addMessage("assistant", answer);
+            history.push({ role: "assistant", content: answer });
+            status.textContent = "";
+          } catch (error) {
+            const msg = String(error?.message || "Unable to process your question.");
+            addMessage("assistant", "Sorry, I hit an issue. Please try again.");
+            status.textContent = msg;
+          } finally {
+            sendBtn.disabled = false;
+            sendBtn.classList.remove("opacity-70", "cursor-not-allowed");
+            input.focus();
+          }
+        });
+      })();
+    </script>
+    {% block scripts %}{% endblock %}
+  </body>
+</html>
+

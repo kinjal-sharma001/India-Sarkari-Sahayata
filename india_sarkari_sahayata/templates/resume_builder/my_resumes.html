@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}My Resumes | India Sarkari Sahayata{% endblock %}
+
+{% block content %}
+  <section class="mx-auto w-full max-w-5xl rounded-2xl bg-white p-6 shadow-sm ring-1 ring-slate-200 sm:p-8">
+    <div class="mb-6 flex items-center justify-between">
+      <div>
+        <h1 class="text-2xl font-bold text-slate-900">My Resumes</h1>
+        <p class="mt-1 text-sm text-slate-600">Save multiple resumes and edit them any time.</p>
+      </div>
+      <a href="{% url 'resume-create' %}" class="rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">Create Resume</a>
+    </div>
+
+    <div class="grid gap-4 sm:grid-cols-2">
+      {% for resume in resumes %}
+        <article class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <p class="font-semibold text-slate-900">{{ resume.full_name }}</p>
+          <p class="mt-1 text-xs text-slate-500">{{ resume.email }}{% if resume.phone %} • {{ resume.phone }}{% endif %}</p>
+          <p class="mt-1 text-xs text-slate-500">Created {{ resume.created_at|date:"M d, Y" }}</p>
+          <div class="mt-3 flex flex-wrap gap-3 text-xs font-semibold">
+            <a href="{% url 'resume-preview' resume.id %}" class="text-brand-700 hover:underline">Preview</a>
+            <a href="{% url 'resume-edit' resume.id %}" class="text-slate-700 hover:underline">Edit</a>
+            <a href="{% url 'resume-download' resume.id %}" class="text-emerald-700 hover:underline">Download PDF</a>
+            <a href="{% url 'resume-analyzer-resume' resume.id %}" class="text-indigo-700 hover:underline">AI Analyze</a>
+          </div>
+        </article>
+      {% empty %}
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm text-slate-600 sm:col-span-2">
+          No resumes yet. Click <span class="font-semibold">Create Resume</span> to add your first one.
+        </div>
+      {% endfor %}
+    </div>
+    <div class="mt-6">
+      <a href="{% url 'resume-analyzer' %}" class="rounded-lg border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50">
+        Open AI Resume Analyzer
+      </a>
+    </div>
+  </section>
+{% endblock %}

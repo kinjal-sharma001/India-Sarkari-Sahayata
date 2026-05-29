@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}Scholarships | India Sarkari Sahayata{% endblock %}
+
+{% block content %}
+  <div class="flex flex-col gap-6">
+    <div>
+      <h1 class="text-2xl font-bold">Scholarships</h1>
+      <p class="mt-1 text-slate-600">Explore verified scholarships with category, eligibility, and education-level filters.</p>
+    </div>
+
+    <section class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+      <form id="schForm" class="grid gap-3 md:grid-cols-5">
+        <input
+          id="schSearch"
+          class="rounded-xl border border-slate-200 px-4 py-3 outline-none focus:ring-2 focus:ring-brand-600 md:col-span-2"
+          placeholder="Search by title, provider, eligibility..."
+          name="search"
+        />
+        <select id="schCategory" class="rounded-xl border border-slate-200 px-4 py-3" name="category">
+          <option value="">All categories</option>
+        </select>
+        <select id="schLevel" class="rounded-xl border border-slate-200 px-4 py-3" name="level">
+          <option value="">All education levels</option>
+        </select>
+        <select id="schEligibility" class="rounded-xl border border-slate-200 px-4 py-3" name="eligibility">
+          <option value="">All eligibility groups</option>
+        </select>
+      </form>
+      <div class="mt-3 text-xs text-slate-500">
+        Add/edit scholarships in <a class="underline" href="/admin/">Admin</a>.
+      </div>
+    </section>
+
+    <section class="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-200">
+      <div class="flex items-center justify-between">
+        <div class="text-sm font-semibold text-slate-700">Results</div>
+        <div id="schMeta" class="text-xs text-slate-500"></div>
+      </div>
+      <div id="schResults" class="mt-4 grid gap-4 md:grid-cols-2 xl:grid-cols-3"></div>
+    </section>
+  </div>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    const form = document.getElementById("schForm");
+    const searchEl = document.getElementById("schSearch");
+    const categoryEl = document.getElementById("schCategory");
+    const levelEl = document.getElementById("schLevel");
+    const eligibilityEl = document.getElementById("schEligibility");
+    const resultsEl = document.getElementById("schResults");
+    const metaEl = document.getElementById("schMeta");
+
+    function upsertOptions(selectEl, values) {
+      const existing = new Set(Array.from(selectEl.options).map((o) => o.value));
+      values.filter(Boolean).sort().forEach((value) => {
+        if (existing.has(value)) return;
+        const opt = document.createElement("option");
+        opt.value = value;
+        opt.textContent = value;
+        selectEl.appendChild(opt);
+      });
+    }
+
+    async function loadFilterOptions() {
+      try {
+        const res = await fetch("/api/scholarships/?is_active=true&page_size=200");
+        if (!res.ok) return;
+        const data = await res.json();
+        const items = data.results || [];
+        const categories = [...new Set(items.map((item) => item.category).filter(Boolean))];
+        const levels = [...new Set(items.map((item) => item.level).filter(Boolean))];
+        const eligibilityTags = [...new Set(
+          items.flatMap((item) => Array.isArray(item.tags) ? item.tags : []).filter(Boolean)
+        )];
+
+        upsertOptions(categoryEl, categories);
+        upsertOptions(levelEl, levels);
+        upsertOptions(eligibilityEl, eligibilityTags);
+      } catch (_error) {
+        // Non-blocking: filter list will stay minimal.
+      }
+    }
+
+    async function loadScholarships() {
+      resultsEl.innerHTML = window.IS_UI.skeletonCards(6);
+      metaEl.textContent = "Loading...";
+
+      const params = new URLSearchParams();
+      if (searchEl.value) params.set("search", searchEl.value);
+      if (categoryEl.value) params.set("category", categoryEl.value);
+      if (levelEl.value) params.set("level", levelEl.value);
+      if (eligibilityEl.value) params.set("eligibility", eligibilityEl.value);
+      params.set("is_active", "true");
+
+      try {
+        const res = await fetch(`/api/scholarships/?${params.toString()}`);
+        if (!res.ok) {
+          const text = await res.text();
+          resultsEl.innerHTML = window.IS_UI.errorBox("Scholarships API error", text);
+          metaEl.textContent = "";
+          return;
+        }
+        const data = await res.json();
+        const items = data.results || [];
+        metaEl.textContent = `${data.count ?? items.length} result(s)`;
+        resultsEl.innerHTML = items.length
+          ? items
+            .map((s) =>
+              window.IS_UI.card({
+                title: s.title,
+                subtitle: [s.category, s.provider, s.level, s.deadline ? `Deadline: ${s.deadline}` : ""].filter(Boolean).join(" • "),
+                href: s.application_url || "#",
+                badge: s.category || "Scholarship",
+                body: s.summary || s.description || s.amount || "",
+                tags: s.tags || [],
+                linkLabel: "Official website",
+                saveUrl: s.id ? `/profile/saved-scholarships/${s.id}/toggle/` : "",
+              })
+            )
+            .join("")
+          : window.IS_UI.emptyState("No scholarships found", "Try broader search terms or reset filters.");
+      } catch (error) {
+        resultsEl.innerHTML = window.IS_UI.errorBox(
+          "Network error",
+          error?.message || "Unable to reach scholarships API right now."
+        );
+        metaEl.textContent = "";
+      }
+    }
+
+    let timer = null;
+    function scheduleLoad() {
+      clearTimeout(timer);
+      timer = setTimeout(loadScholarships, 250);
+    }
+
+    form.addEventListener("input", scheduleLoad);
+    loadFilterOptions().then(loadScholarships);
+  </script>
+{% endblock %}
+

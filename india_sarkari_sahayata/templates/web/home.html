@@ -1,0 +1,123 @@
+{% extends "base.html" %}
+{% block title %}India Sarkari Sahayata{% endblock %}
+
+{% block content %}
+  <!-- Hero & Search Section -->
+  <section class="is-gradient-panel is-fade-up p-6 sm:p-8">
+    <div class="max-w-4xl mx-auto">
+      <p class="text-xs font-semibold uppercase tracking-[0.2em] text-govt-700">AI-Enhanced National Opportunity Portal</p>
+      <h1 class="is-premium-title mt-2 text-3xl tracking-tight text-slate-900 sm:text-4xl" style="font-family: 'Plus Jakarta Sans', Inter, sans-serif;">Find Your Opportunity</h1>
+      <p class="mt-3 text-sm text-slate-700 sm:text-base">
+        Search across government jobs, welfare schemes, and educational scholarships in one place.
+      </p>
+      
+      <!-- Enhanced Search Bar -->
+      <div class="mt-6 relative z-40">
+        <div class="relative">
+          <div class="flex gap-2">
+            <input
+              id="dashboard-search-input"
+              type="text"
+              placeholder="Search jobs, schemes, scholarships..."
+              class="flex-1 rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm outline-none ring-brand-100 transition focus:border-brand-600 focus:bg-white focus:ring-4"
+            />
+            <select id="dashboard-type-filter" class="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm text-slate-700">
+              <option value="">All types</option>
+              <option value="jobs">Jobs</option>
+              <option value="schemes">Schemes</option>
+              <option value="scholarships">Scholarships</option>
+            </select>
+            <button id="dashboard-search-btn" type="button" class="rounded-xl bg-brand-600 px-6 py-3 text-sm font-semibold text-white hover:bg-brand-700">
+              Search
+            </button>
+          </div>
+          <div id="dashboard-search-results" class="absolute top-14 left-0 z-50 hidden w-full rounded-xl border border-slate-200 bg-white shadow-2xl max-h-96 overflow-y-auto"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Quick Stats -->
+  <section class="grid gap-4 sm:grid-cols-3">
+    <article class="is-stat-card is-fade-up p-5">
+      <p class="text-sm font-medium text-slate-500">Jobs Available</p>
+      <p id="dashboardJobsCount" class="mt-2 text-2xl font-bold text-slate-900">--</p>
+      <p class="mt-1 text-xs text-slate-500">Live & searchable positions</p>
+    </article>
+    <article class="is-stat-card is-fade-up is-fade-up-delay-1 p-5">
+      <p class="text-sm font-medium text-slate-500">Active Schemes</p>
+      <p id="dashboardSchemesCount" class="mt-2 text-2xl font-bold text-slate-900">--</p>
+      <p class="mt-1 text-xs text-slate-500">Welfare & development programs</p>
+    </article>
+    <article class="is-stat-card is-fade-up is-fade-up-delay-2 p-5">
+      <p class="text-sm font-medium text-slate-500">Scholarships</p>
+      <p id="dashboardScholarshipsCount" class="mt-2 text-2xl font-bold text-slate-900">--</p>
+      <p class="mt-1 text-xs text-slate-500">Educational opportunities</p>
+    </article>
+  </section>
+
+  <!-- Featured Opportunities (Non-repetitive) -->
+  <section class="grid gap-6 lg:grid-cols-2">
+    <!-- AI Assistant Feature -->
+    <article class="is-panel is-fade-up p-6 rounded-2xl border-2 border-indigo-200 bg-gradient-to-br from-indigo-50 to-blue-50">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide text-indigo-700">Smart Tools</p>
+          <h3 class="mt-2 text-xl font-semibold text-slate-900">AI-Powered Guidance</h3>
+          <p class="mt-2 text-sm text-slate-600">Get personalized recommendations for jobs and schemes. Analyze resumes and get career advice from AI.</p>
+          <a href="/ai-assistant/" class="mt-4 inline-flex rounded-lg bg-indigo-600 px-4 py-2 text-sm font-semibold text-white hover:bg-indigo-700">Open AI Hub</a>
+        </div>
+      </div>
+    </article>
+
+    <!-- Resume Builder Feature -->
+    <article class="is-panel is-fade-up is-fade-up-delay-1 p-6">
+      <div class="flex items-start justify-between">
+        <div>
+          <p class="text-xs font-semibold uppercase tracking-wide text-slate-500">Career Tools</p>
+          <h3 class="mt-2 text-xl font-semibold text-slate-900">Resume Builder</h3>
+          <p class="mt-2 text-sm text-slate-600">Create ATS-friendly resumes, download as PDF, and track your applications all in one place.</p>
+          <a href="{% url 'resume-create' %}" class="mt-4 inline-flex rounded-lg bg-brand-600 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-700">Create Resume</a>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- My Resumes Section -->
+  {% if my_resumes %}
+  <section class="is-panel p-6">
+    <h2 class="text-lg font-semibold text-slate-900">Your Resumes</h2>
+    <div class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {% for resume in my_resumes %}
+        <article class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+          <p class="font-semibold text-slate-900">{{ resume.full_name }}</p>
+          <p class="mt-1 text-xs text-slate-500">Created {{ resume.created_at|date:"M d, Y" }}</p>
+          <div class="mt-3 flex flex-wrap gap-2 text-xs font-semibold">
+            <a href="{% url 'resume-preview' resume.id %}" class="text-brand-700 hover:underline">Preview</a>
+            <a href="{% url 'resume-edit' resume.id %}" class="text-slate-700 hover:underline">Edit</a>
+            <a href="{% url 'resume-download' resume.id %}" class="text-emerald-700 hover:underline">Download</a>
+          </div>
+        </article>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <!-- Call-to-Action Section -->
+  <section class="is-gradient-panel p-8 text-center">
+    <h2 class="is-premium-title text-3xl tracking-tight md:text-4xl" style="font-family: 'Plus Jakarta Sans', Inter, sans-serif;">Ready to explore opportunities?</h2>
+    <p class="mt-3 text-slate-600">Use the search bar above or visit specialized sections for filtered browsing.</p>
+    <div class="mt-6 flex flex-col gap-3 sm:flex-row justify-center">
+      <a href="/jobs/" class="rounded-xl bg-brand-600 px-5 py-3 font-semibold text-white hover:bg-brand-700">Browse Jobs</a>
+      <a href="/schemes/" class="rounded-xl border border-slate-200 px-5 py-3 font-semibold hover:bg-slate-50">Browse Schemes</a>
+      <a href="/scholarships/" class="rounded-xl border border-slate-200 px-5 py-3 font-semibold hover:bg-slate-50">Browse Scholarships</a>
+    </div>
+  </section>
+{% endblock %}
+
+{% block scripts %}
+  <script>
+    window.IS_UI.initDashboardSearch();
+  </script>
+{% endblock %}
+
